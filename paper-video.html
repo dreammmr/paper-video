@@ -7,10 +7,9 @@
 *
 *   *** PAPER VIDEO ***
 *   
-*   This floating action button is using the Material Design concept of expandable
-*   Paper Fab Button and using the Polymer components to make the concept happen.
+*   This video player is using Material Design concepts to play a video files. 
+*   Paper Video is using the Polymer components to make the concept happen.
 *   
-*  
 *
 ********** -->
 
@@ -23,17 +22,30 @@
 <link rel="import" href="../iron-icons/av-icons.html">
 <dom-module id="paper-video">
 	<style is="custom-style">
+		:host {
+			--paper-video-controls-background: white;
+			--paper-video-controls-color: #595959;
+			--paper-video-slider-color: #3367D6;
+		}
+		:host paper-ripple {
+			color: --paper-video-controls-color;
+		}
+		:host paper-slider {
+			--paper-slider-active-color: var(--paper-video-slider-color);
+			--paper-slider-knob-color: var(--paper-video-slider-color);
+		}
 		:host .container {
 			position: relative;
 			display: inline-block;
 		}
 		:host #videoControls {
 			position: absolute;
-			bottom: 0;
+			bottom: 4px;
 			left: 0;
 			right: 0;
 			display: flex;
-			background-color: white;
+			color: var(--paper-video-controls-color);
+			background-color: var(--paper-video-controls-background);
 			padding: 15px;
 			align-items: center;
 		}
@@ -54,6 +66,9 @@
 		:host #container:-webkit-full-screen, :host #container:-webkit-full-screen video {
 		  width: 100vw;
 		  height: 100vh;
+		}
+		:host video {
+			background-color: black;
 		}
 	</style>
 	<template>
@@ -92,10 +107,6 @@
 					type: Boolean,
 					value: false
 				},
-				poster: {
-					type: Boolean,
-					value: false
-				},
 				muted: {
 					type: Boolean,
 					value: false
@@ -118,11 +129,17 @@
 
 				that.$.paperVideo.addEventListener('timeupdate', function(){
 
+					if(that.$.paperVideo.paused || that.$.paperVideo.ended)
+						that.$.playPauseIcon.setAttribute('icon', 'av:play-arrow');
+					else
+						that.$.playPauseIcon.setAttribute('icon', 'av:pause');
+
 					video = that.$.paperVideo;
 					that.currentTick = that.readableDuration(video.currentTime);
 
 					// Setting the video parameters to the component
 					that.duration = video.duration;
+					that.currentTime = video.currentTime;
 					that.videoTimeline = ( video.currentTime / video.duration ) * 100;
 
 				});
@@ -157,7 +174,7 @@
 					that.$.volumeSlider.fire('change');
 				});
 				that.$.fullScreen.addEventListener('click', function(){
-					that.toggleFullScreen();
+					that.toggleFullScreen(that.$.container);
 				});
 			},
 			readableDuration: function(seconds) {
@@ -170,11 +187,9 @@
 				return min + ':' + sec;
 		    },
 			play: function(){
-				this.$.playPauseIcon.setAttribute('icon', 'av:pause');
 				return this.$.paperVideo.play();
 			},
 			pause: function(){
-				this.$.playPauseIcon.setAttribute('icon', 'av:play-arrow');
 				return this.$.paperVideo.pause();
 			},
 			toggle: function(){
@@ -187,30 +202,30 @@
 					that.pause();
 				}
 			},
-			toggleFullScreen: function() {
-				var elem = this.$.container;
-
-				if (!elem.fullscreenElement && !elem.mozFullScreenElement && !elem.webkitFullscreenElement && !elem.msFullscreenElement ) {
-					if (elem.requestFullscreen) {
-					  elem.requestFullscreen();
-					} else if (elem.msRequestFullscreen) {
-					  elem.msRequestFullscreen();
-					} else if (elem.mozRequestFullScreen) {
-					  elem.mozRequestFullScreen();
-					} else if (elem.webkitRequestFullscreen) {
-					  elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-					}
-				} else {
-					if (elem.exitFullscreen) {
-					  elem.exitFullscreen();
-					} else if (elem.msExitFullscreen) {
-					  elem.msExitFullscreen();
-					} else if (elem.mozCancelFullScreen) {
-					  elem.mozCancelFullScreen();
-					} else if (elem.webkitExitFullscreen) {
-					  elem.webkitExitFullscreen();
-					}
-				}
+			toggleFullScreen: function(elem) {
+			  elem = elem || document.documentElement;
+			  if (!document.fullscreenElement && !document.mozFullScreenElement &&
+			    !document.webkitFullscreenElement && !document.msFullscreenElement) {
+			    if (elem.requestFullscreen) {
+			      elem.requestFullscreen();
+			    } else if (elem.msRequestFullscreen) {
+			      elem.msRequestFullscreen();
+			    } else if (elem.mozRequestFullScreen) {
+			      elem.mozRequestFullScreen();
+			    } else if (elem.webkitRequestFullscreen) {
+			      elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+			    }
+			  } else {
+			    if (document.exitFullscreen) {
+			      document.exitFullscreen();
+			    } else if (document.msExitFullscreen) {
+			      document.msExitFullscreen();
+			    } else if (document.mozCancelFullScreen) {
+			      document.mozCancelFullScreen();
+			    } else if (document.webkitExitFullscreen) {
+			      document.webkitExitFullscreen();
+			    }
+			  }
 			}
 		})
 	</script>
