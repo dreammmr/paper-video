@@ -35,24 +35,40 @@
 			display: flex;
 			background-color: white;
 			padding: 15px;
+			align-items: center;
 		}
 		:host paper-ripple {
 			color: white;
+			opacity: 0.4;
+		}
+		:host #durationSlider {
+			flex: 1;
+		}
+		:host #volumeSlider {
+			max-width: 120px;
+		}
+		:host .video-time {
+		    font-family: 'Roboto';
+    		font-size: 12px;
+		}
+		:host #container:-webkit-full-screen, :host #container:-webkit-full-screen video {
+		  width: 100vw;
+		  height: 100vh;
 		}
 	</style>
 	<template>
-		<div class="container">
+		<div id="container" class="container">
 			<paper-ripple></paper-ripple>
 			<div class="video">
 				<video on-tap="toggle" width$="{{width}}" muted$="{{muted}}" poster$="{{poster}}" preload$="{{preload}}" height$="{{height}}" id="paperVideo" src$="{{src}}" autoplay$="{{autoplay}}" loop$="{{loop}}"></video>
 			</div>
 			<paper-material elevation="1" hidden$="{{!controls}}" id="videoControls">
-				<paper-icon-button on-tap="toggle" icon="av:play-arrow"></paper-icon-button>
-				<span>0:00/1:30</span>
+				<paper-icon-button id="playPauseIcon" on-tap="toggle" icon="av:play-arrow"></paper-icon-button>
+				<span class="video-time">{{currentTick}}/{{durationTick}}</span>
 				<paper-slider id="durationSlider" value="{{videoTimeline}}"></paper-slider>
-				<paper-icon-button icon="av:volume-up"></paper-icon-button>
-				<paper-slider id="volumeSlider" value="40"></paper-slider>
-				<paper-icon-button icon="icons:fullscreen"></paper-icon-button>
+				<paper-icon-button id="toggleMute" icon="av:volume-up"></paper-icon-button>
+				<paper-slider id="volumeSlider" value="{{videoVolume}}"></paper-slider>
+				<paper-icon-button id="fullScreen" icon="icons:fullscreen"></paper-icon-button>
 			</div>
 		</div>
 	</template>
@@ -84,6 +100,9 @@
 					type: Boolean,
 					value: false
 				},
+				videoVolume: {
+					value: 100
+				}
 			},
 			attached: function(){
 
@@ -92,11 +111,15 @@
 
 				that.$.paperVideo.addEventListener('canplay', function(){
 					video = that.$.paperVideo;
+
+					that.currentTick = that.readableDuration(video.currentTime);
+					that.durationTick = that.readableDuration(video.duration);
 				})
 
 				that.$.paperVideo.addEventListener('timeupdate', function(){
 
 					video = that.$.paperVideo;
+					that.currentTick = that.readableDuration(video.currentTime);
 
 					// Setting the video parameters to the component
 					that.duration = video.duration;
@@ -104,25 +127,54 @@
 
 				});
 
-				function setTimelineFrame(){
+				function setTimelineFrame(e){
 					video = that.$.paperVideo;
-					video.currentTime = video.duration * that.videoTimeline / 100;
+					video.currentTime = Math.floor(video.duration * e.target.getAttribute('value') / 100);
 				}
 
-				that.$.durationSlider.addEventListener('mousedown', function(){
-					setTimelineFrame();
-					that.$.durationSlider.addEventListener('mousemove', setTimelineFrame);
-				});
-				that.$.durationSlider.addEventListener('mouseup', function(){
-					setTimelineFrame();
-					that.$.durationSlider.removeEventListener('mousemove');
+				that.$.durationSlider.addEventListener('change', setTimelineFrame);
+				that.$.volumeSlider.addEventListener('change', function(e){
+					video.volume = that.videoVolume / 100;
+
+					if(video.volume) {
+						that.$.toggleMute.setAttribute('icon', 'av:volume-up');
+					} else {
+						that.$.toggleMute.setAttribute('icon', 'av:volume-off');
+					}
 				});
 
+				var volume;
+				that.$.toggleMute.addEventListener('click', function(e){
+
+					if(that.videoVolume) {
+						volume = that.videoVolume;
+						video.volume = that.videoVolume = 0;
+					} else {
+						volume && (video.volume = volume / 100);
+						volume && (that.videoVolume = volume)
+					}
+
+					that.$.volumeSlider.fire('change');
+				});
+				that.$.fullScreen.addEventListener('click', function(){
+					that.toggleFullScreen();
+				});
 			},
+			readableDuration: function(seconds) {
+				sec = Math.floor( seconds );
+				min = Math.floor( sec / 60 );
+				min = min >= 10 ? min : '0' + min;
+				sec = Math.floor( sec % 60 );
+				sec = sec >= 10 ? sec : '0' + sec;
+
+				return min + ':' + sec;
+		    },
 			play: function(){
+				this.$.playPauseIcon.setAttribute('icon', 'av:pause');
 				return this.$.paperVideo.play();
 			},
 			pause: function(){
+				this.$.playPauseIcon.setAttribute('icon', 'av:play-arrow');
 				return this.$.paperVideo.pause();
 			},
 			toggle: function(){
@@ -130,9 +182,34 @@
 				video = that.$.paperVideo;
 
 				if(video.paused || video.ended) {
-					video.play();
+					that.play();
 				} else {
-					video.pause();
+					that.pause();
+				}
+			},
+			toggleFullScreen: function() {
+				var elem = this.$.container;
+
+				if (!elem.fullscreenElement && !elem.mozFullScreenElement && !elem.webkitFullscreenElement && !elem.msFullscreenElement ) {
+					if (elem.requestFullscreen) {
+					  elem.requestFullscreen();
+					} else if (elem.msRequestFullscreen) {
+					  elem.msRequestFullscreen();
+					} else if (elem.mozRequestFullScreen) {
+					  elem.mozRequestFullScreen();
+					} else if (elem.webkitRequestFullscreen) {
+					  elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+					}
+				} else {
+					if (elem.exitFullscreen) {
+					  elem.exitFullscreen();
+					} else if (elem.msExitFullscreen) {
+					  elem.msExitFullscreen();
+					} else if (elem.mozCancelFullScreen) {
+					  elem.mozCancelFullScreen();
+					} else if (elem.webkitExitFullscreen) {
+					  elem.webkitExitFullscreen();
+					}
 				}
 			}
 		})
