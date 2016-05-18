@@ -1,0 +1,140 @@
+<!--
+@author Arshak Khachatrian (<a href="mailto:akhxtern@gmail.com">akhxtern@gmail.com</a>)
+@website http://spacee.xyz
+@updateDate May 14, 2016
+
+**********
+*
+*   *** PAPER VIDEO ***
+*   
+*   This floating action button is using the Material Design concept of expandable
+*   Paper Fab Button and using the Polymer components to make the concept happen.
+*   
+*  
+*
+********** -->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/av-icons.html">
+<dom-module id="paper-video">
+	<style is="custom-style">
+		:host .container {
+			position: relative;
+			display: inline-block;
+		}
+		:host #videoControls {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			display: flex;
+			background-color: white;
+			padding: 15px;
+		}
+		:host paper-ripple {
+			color: white;
+		}
+	</style>
+	<template>
+		<div class="container">
+			<paper-ripple></paper-ripple>
+			<div class="video">
+				<video on-tap="toggle" width$="{{width}}" muted$="{{muted}}" poster$="{{poster}}" preload$="{{preload}}" height$="{{height}}" id="paperVideo" src$="{{src}}" autoplay$="{{autoplay}}" loop$="{{loop}}"></video>
+			</div>
+			<paper-material elevation="1" hidden$="{{!controls}}" id="videoControls">
+				<paper-icon-button on-tap="toggle" icon="av:play-arrow"></paper-icon-button>
+				<span>0:00/1:30</span>
+				<paper-slider id="durationSlider" value="{{videoTimeline}}"></paper-slider>
+				<paper-icon-button icon="av:volume-up"></paper-icon-button>
+				<paper-slider id="volumeSlider" value="40"></paper-slider>
+				<paper-icon-button icon="icons:fullscreen"></paper-icon-button>
+			</div>
+		</div>
+	</template>
+	<script>
+		Polymer({
+			is: 'paper-video',
+			properties: {
+				controls: {
+					type: Boolean,
+					value: false
+				},
+				autoplay: {
+					type: Boolean,
+					value: false
+				},
+				loop: {
+					type: Boolean,
+					value: false
+				},
+				preload: {
+					type: Boolean,
+					value: false
+				},
+				poster: {
+					type: Boolean,
+					value: false
+				},
+				muted: {
+					type: Boolean,
+					value: false
+				},
+			},
+			attached: function(){
+
+				var that = this,
+					video;
+
+				that.$.paperVideo.addEventListener('canplay', function(){
+					video = that.$.paperVideo;
+				})
+
+				that.$.paperVideo.addEventListener('timeupdate', function(){
+
+					video = that.$.paperVideo;
+
+					// Setting the video parameters to the component
+					that.duration = video.duration;
+					that.videoTimeline = ( video.currentTime / video.duration ) * 100;
+
+				});
+
+				function setTimelineFrame(){
+					video = that.$.paperVideo;
+					video.currentTime = video.duration * that.videoTimeline / 100;
+				}
+
+				that.$.durationSlider.addEventListener('mousedown', function(){
+					setTimelineFrame();
+					that.$.durationSlider.addEventListener('mousemove', setTimelineFrame);
+				});
+				that.$.durationSlider.addEventListener('mouseup', function(){
+					setTimelineFrame();
+					that.$.durationSlider.removeEventListener('mousemove');
+				});
+
+			},
+			play: function(){
+				return this.$.paperVideo.play();
+			},
+			pause: function(){
+				return this.$.paperVideo.pause();
+			},
+			toggle: function(){
+				var that = this,
+				video = that.$.paperVideo;
+
+				if(video.paused || video.ended) {
+					video.play();
+				} else {
+					video.pause();
+				}
+			}
+		})
+	</script>
+</dom-module>
