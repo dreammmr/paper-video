@@ -5,6 +5,13 @@ controls in the bottom. User can fully customize the controllers and the events.
 
 [Live Example](http://spacee.xyz/paper-video/demo.html)
 
+##Installing with Bower
+
+To install the component with the Bower, just run: 
+
+`bower install --save paper-video`
+
+
 Example:
 
 ```html
