@@ -75,7 +75,7 @@
 		<div id="container" class="container">
 			<paper-ripple></paper-ripple>
 			<div class="video">
-				<video on-tap="toggle" width$="{{width}}" muted$="{{muted}}" poster$="{{poster}}" preload$="{{preload}}" height$="{{height}}" id="paperVideo" src$="{{src}}" autoplay$="{{autoplay}}" loop$="{{loop}}"></video>
+				<video on-tap="toggle" muted="{{muted}}" width="{{width}}" poster="{{poster}}" preload="{{preload}}" height="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
 			</div>
 			<paper-material elevation="1" hidden$="{{!controls}}" id="videoControls">
 				<paper-icon-button id="playPauseIcon" on-tap="toggle" icon="av:play-arrow"></paper-icon-button>
@@ -93,23 +93,29 @@
 			properties: {
 				controls: {
 					type: Boolean,
-					value: false
+					value: false,
+					notify: true
 				},
 				autoplay: {
 					type: Boolean,
-					value: false
+					value: false,
+					notify: true
 				},
 				loop: {
 					type: Boolean,
-					value: false
+					value: false,
+					notify: true
 				},
 				preload: {
 					type: Boolean,
-					value: false
+					value: false,
+					notify: true
 				},
 				muted: {
 					type: Boolean,
-					value: false
+					value: false,
+					reflectToAttribute: true,
+					notify: true
 				},
 				videoVolume: {
 					value: 100
