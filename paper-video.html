@@ -6,10 +6,10 @@
 **********
 *
 *   *** PAPER VIDEO ***
-*   
-*   This video player is using Material Design concepts to play a video files. 
+*
+*   This video player is using Material Design concepts to play a video files.
 *   Paper Video is using the Polymer components to make the concept happen.
-*   
+*
 *
 ********** -->
 
@@ -121,6 +121,9 @@
 					value: 100
 				}
 			},
+      listeners: {
+        'keypress': '_onKeyPressed'
+      },
 			attached: function(){
 
 				var that = this,
@@ -232,7 +235,12 @@
 			      document.webkitExitFullscreen();
 			    }
 			  }
-			}
+			},
+      _onKeyPressed: function(e) {
+        if (e.which === 32 || e.key === 'Spacebar' || e.keyCode === 32) {
+          this.toggle();
+        }
+      }
 		})
 	</script>
 </dom-module>
