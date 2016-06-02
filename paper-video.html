@@ -37,6 +37,7 @@
 		:host .container {
 			position: relative;
 			display: inline-block;
+      outline: none;
 		}
 		:host #videoControls {
 			position: absolute;
@@ -85,7 +86,7 @@
     }
 	</style>
 	<template>
-		<div id="container" class="container">
+		<div id="container" class="container" tabindex$=[[tabindex]]>
 			<paper-ripple></paper-ripple>
 			<div class="video">
 				<video on-tap="toggle" muted="{{muted}}" width="{{width}}" poster="{{poster}}" preload="{{preload}}" height="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
@@ -104,6 +105,10 @@
 		Polymer({
 			is: 'paper-video',
 			properties: {
+        tabindex: {
+          type: Number,
+          value: 0
+        },
 				controls: {
 					type: Boolean,
 					value: false,
@@ -145,6 +150,13 @@
 
 				var that = this,
 					video;
+
+        that.$.container.addEventListener('keydown', function(e) {
+          if (e.which === 32 || e.key === 'Spacebar' || e.keyCode === 32) {
+            that.toggle();
+            e.preventDefault();
+          }
+        })
 
 				that.$.paperVideo.addEventListener('canplay', function(){
 					video = that.$.paperVideo;
@@ -262,13 +274,6 @@
 			    }
 			  }
 			},
-      _onKeyPressed: function(e) {
-        e.preventDefault();
-        if (e.which === 32 || e.key === 'Spacebar' || e.keyCode === 32) {
-          this.toggle();
-        }
-        this._wakeupControls();
-      },
       _wakeupControls: function() {
         clearTimeout(this._controlSleepTimeout);
         this.classList.remove('controls-hidden');
