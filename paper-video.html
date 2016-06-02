@@ -25,7 +25,7 @@
 		:host {
 			--paper-video-controls-background: white;
 			--paper-video-controls-color: #595959;
-			--paper-video-slider-color: #3367D6;
+			--paper-video-slider-color: var(--primary-color);
 		}
 		:host paper-ripple {
 			color: --paper-video-controls-color;
@@ -49,6 +49,7 @@
 			background-color: var(--paper-video-controls-background);
 			padding: 15px;
 			align-items: center;
+      transition: 0.1s;
 		}
 		:host paper-ripple {
 			color: white;
@@ -71,6 +72,18 @@
 		:host video {
 			background-color: black;
 		}
+    :host(.controls-hidden)) {
+      cursor: none;
+    }
+    :host(.controls-hidden:not([controls])) {
+      cursor: default;
+    }
+    :host(.controls-hidden) #videoControls {
+      transition: 0.5s;
+      opacity: 0;
+      pointer-events: none;
+      touch-action: none;
+    }
 	</style>
 	<template>
 		<div id="container" class="container" tabindex$=[[tabindex]]>
@@ -124,8 +137,15 @@
 				},
 				videoVolume: {
 					value: 100
-				}
+				},
+        autohideControls: {
+          type: Number,
+          value: 1000
+        }
 			},
+      listeners: {
+        'mousemove': '_wakeupControls'
+      },
 			attached: function(){
 
 				var that = this,
@@ -147,10 +167,14 @@
 
 				that.$.paperVideo.addEventListener('timeupdate', function(){
 
-					if(that.$.paperVideo.paused || that.$.paperVideo.ended)
+					if(that.$.paperVideo.paused || that.$.paperVideo.ended) {
 						that.$.playPauseIcon.setAttribute('icon', 'av:play-arrow');
-					else
+					} else {
 						that.$.playPauseIcon.setAttribute('icon', 'av:pause');
+            if (that.autohideControls > 0 && !that._controlSleepTimeout) {
+              that._controlSleepTimeout = setTimeout(that._sleepControls.bind(that), that.autohideControls);
+            }
+          }
 
 					video = that.$.paperVideo;
 					that.currentTick = that.readableDuration(video.currentTime);
@@ -161,6 +185,11 @@
 					that.videoTimeline = ( video.currentTime / video.duration ) * 100;
 
 				});
+
+        that.$.paperVideo.addEventListener('pause', that._wakeupControls.bind(that));
+        that.$.paperVideo.addEventListener('stalled', that._wakeupControls.bind(that));
+        that.$.paperVideo.addEventListener('waiting', that._wakeupControls.bind(that));
+        that.$.paperVideo.addEventListener('error', that._wakeupControls.bind(that));
 
 				function setTimelineFrame(e){
 					video = that.$.paperVideo;
@@ -244,7 +273,15 @@
 			      document.webkitExitFullscreen();
 			    }
 			  }
-			}
+			},
+      _wakeupControls: function() {
+        clearTimeout(this._controlSleepTimeout);
+        this.classList.remove('controls-hidden');
+        this._controlSleepTimeout = null;
+      },
+      _sleepControls: function() {
+        this.classList.add('controls-hidden');
+      }
 		})
 	</script>
 </dom-module>
