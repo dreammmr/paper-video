@@ -70,18 +70,18 @@
 
 	<div class="paper-font-display1">&#x3C;paper-video&#x3E;</div>
 	<paper-material elevation="1">
-		<div class="paper-font-button">Default mode (with controls, poster)</div>
+		<div class="paper-font-button">Default mode (with controls, poster, autohide)</div>
 		<div class="code-area">
 			<pre>
-&#x3C;paper-video controls poster=&#x22;demo.jpeg&#x22; src=&#x22;demo.mp4&#x22;&#x3E;&#x3C;/paper-video&#x3E;
+&#x3C;paper-video controls poster=&#x22;demo.jpeg&#x22; src=&#x22;demo.mp4&#x22; autohide-controls="1000"&#x3E;&#x3C;/paper-video&#x3E;
 			</pre>
 		</div>
 
-		<paper-video controls poster="demo.jpeg" src="demo.mp4"></paper-video>	
+		<paper-video controls poster="demo.jpeg" src="demo.mp4" autohide-controls="1000"></paper-video>
 	</paper-material>
 
 	<paper-material elevation="1">
-		<div class="paper-font-button">Custom mode (with controls, without poster)</div>
+		<div class="paper-font-button">Custom mode (with controls, without poster, autohide disabled)</div>
 		<div class="code-area">
 			<pre>
 &#x3C;style is=&#x22;custom-style&#x22;&#x3E;
@@ -92,11 +92,11 @@
 &#x9;}
 &#x3C;/style&#x3E;
 
-&#x3C;paper-video class=&#x22;custom&#x22; controls src=&#x22;demo.mp4&#x22;&#x3E;&#x3C;/paper-video&#x3E;&#x9;
+&#x3C;paper-video class=&#x22;custom&#x22; controls src=&#x22;demo.mp4&#x22; autohide-controls="0" &#x3E;&#x3C;/paper-video&#x3E;&#x9;
 			</pre>
 		</div>
 
-		<paper-video class="custom" controls src="demo.mp4"></paper-video>	
+		<paper-video class="custom" controls src="demo.mp4" autohide-controls="0"></paper-video>
 	</paper-material>
 
 	<paper-material elevation="1">
@@ -107,7 +107,7 @@
 			</pre>
 		</div>
 
-		<paper-video loop autoplay muted src="demo.mp4"></paper-video>	
+		<paper-video loop autoplay muted src="demo.mp4"></paper-video>
 	</paper-material>
 </body>
 </html>
