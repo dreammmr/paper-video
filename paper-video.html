@@ -27,9 +27,7 @@
 			--paper-video-controls-background: white;
 			--paper-video-controls-color: #595959;
 			--paper-video-slider-color: var(--primary-color);
-		}
-		:host paper-ripple {
-			color: --paper-video-controls-color;
+      @apply(--paper-video);
 		}
 		:host paper-slider {
 			--paper-slider-active-color: var(--paper-video-slider-color);
@@ -39,6 +37,7 @@
 			position: relative;
 			display: inline-block;
       outline: none;
+      @apply(--paper-video-container);
 		}
 		:host #videoControls {
 			position: absolute;
@@ -51,9 +50,10 @@
 			padding: 15px;
 			align-items: center;
       transition: 0.1s;
+      @apply(--paper-video-controls);
 		}
 		:host paper-ripple {
-			color: white;
+			color: var(--paper-video-ripple-color, var(--paper-video-controls-color));
 			opacity: 0.4;
 		}
 		:host #durationSlider {
@@ -71,6 +71,7 @@
 		}
 		:host video {
 			background-color: black;
+      @apply(--paper-video-video);
 		}
     :host(.controls-hidden)) {
       cursor: none;
