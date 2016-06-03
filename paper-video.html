@@ -18,6 +18,7 @@
 <link rel="import" href="../paper-material/paper-material.html">
 <link rel="import" href="../paper-slider/paper-slider.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-icons/av-icons.html">
 <dom-module id="paper-video">
@@ -62,8 +63,7 @@
 			max-width: 120px;
 		}
 		:host .video-time {
-		    font-family: 'Roboto';
-    		font-size: 12px;
+      @apply(--paper-font-caption);
 		}
 		:host #container:-webkit-full-screen, :host #container:-webkit-full-screen video {
 		  width: 100vw;
