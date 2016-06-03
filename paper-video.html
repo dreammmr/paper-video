@@ -76,7 +76,7 @@
 			background-color: black;
       @apply(--paper-video-video);
 		}
-    :host(.controls-hidden)) {
+    :host(.controls-hidden) {
       cursor: none;
     }
     :host(.controls-hidden:not([controls])) {
@@ -116,7 +116,8 @@
 				controls: {
 					type: Boolean,
 					value: false,
-					notify: true
+					notify: true,
+          reflectToAttribute: true
 				},
 				autoplay: {
 					type: Boolean,
