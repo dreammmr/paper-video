@@ -107,7 +107,7 @@
         <div id="container" class="container" tabindex$=[[tabindex]]>
             <paper-ripple></paper-ripple>
             <div class="video">
-                <video on-tap="toggle" muted="{{muted}}" width="{{width}}" poster="{{poster}}" preload="{{preload}}" height="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
+                <video on-tap="_handleTap" muted="{{muted}}" width="{{width}}" poster="{{poster}}" preload="{{preload}}" height="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
             </div>
             <paper-material elevation="1" hidden$="{{!controls}}" id="videoControls">
                 <paper-icon-button id="playPauseIcon" on-tap="toggle" icon="av:play-arrow"></paper-icon-button>
@@ -160,6 +160,10 @@
             autohideControls: {
                 type: Number,
                 value: 1000
+            },
+            _dblTapDelay: {
+                type: Number,
+                value: 300
             }
         },
         listeners: {
@@ -295,6 +299,18 @@
         },
         _sleepControls: function() {
             this.classList.add('controls-hidden');
+        },
+        _handleTap: function() {
+            if (this._dblTapTimer) {
+                clearTimeout(this._dblTapTimer);
+                delete this._dblTapTimer;
+                this.toggleFullScreen(this.$.container);
+            } else {
+                this._dblTapTimer = setTimeout(function() {
+                    this.toggle();
+                    delete this._dblTapTimer;
+                }.bind(this), this._dblTapDelay);
+            }
         }
     });
     </script>
