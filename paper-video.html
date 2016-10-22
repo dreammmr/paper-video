@@ -166,8 +166,9 @@
             'mousemove': '_wakeupControls'
         },
         attached: function() {
-            const that = this;
-            var video, volume;
+            const that = this,
+                video = that.$.paperVideo;
+            var volume;
 
             that.$.container.addEventListener('keydown', function(e) {
                 if (e.which === 32 || e.key === 'Spacebar' || e.keyCode === 32) {
@@ -177,14 +178,12 @@
             })
 
             that.$.paperVideo.addEventListener('canplay', function() {
-                video = that.$.paperVideo;
-
                 that.currentTick = that.readableDuration(video.currentTime);
                 that.durationTick = that.readableDuration(video.duration);
             })
 
-            that.$.paperVideo.addEventListener('timeupdate', function() {
-                if (that.$.paperVideo.paused || that.$.paperVideo.ended) {
+            video.addEventListener('timeupdate', function() {
+                if (video.paused || video.ended) {
                     that.$.playPauseIcon.setAttribute('icon', 'av:play-arrow');
                 } else {
                     that.$.playPauseIcon.setAttribute('icon', 'av:pause');
@@ -193,7 +192,6 @@
                     }
                 }
 
-                video = that.$.paperVideo;
                 that.currentTick = that.readableDuration(video.currentTime);
 
                 // Setting the video parameters to the component
@@ -202,17 +200,15 @@
                 that.videoTimeline = (video.currentTime / video.duration) * 100;
             });
 
-            that.$.paperVideo.addEventListener('pause', that._wakeupControls.bind(that));
-            that.$.paperVideo.addEventListener('stalled', that._wakeupControls.bind(that));
-            that.$.paperVideo.addEventListener('waiting', that._wakeupControls.bind(that));
-            that.$.paperVideo.addEventListener('error', that._wakeupControls.bind(that));
+            video.addEventListener('pause', that._wakeupControls.bind(that));
+            video.addEventListener('stalled', that._wakeupControls.bind(that));
+            video.addEventListener('waiting', that._wakeupControls.bind(that));
+            video.addEventListener('error', that._wakeupControls.bind(that));
 
-            function setTimelineFrame(e) {
-                video = that.$.paperVideo;
+            that.$.durationSlider.addEventListener('change', function(e) {
                 video.currentTime = Math.floor(video.duration * e.target.getAttribute('value') / 100);
-            }
+            });
 
-            that.$.durationSlider.addEventListener('change', setTimelineFrame);
             that.$.volumeSlider.addEventListener('change', function(e) {
                 video.volume = that.videoVolume / 100;
 
@@ -227,9 +223,9 @@
                 if (that.videoVolume) {
                     volume = that.videoVolume;
                     video.volume = that.videoVolume = 0;
-                } else {
-                    volume && (video.volume = volume / 100);
-                    volume && (that.videoVolume = volume);
+                } else if (volume) {
+                    video.volume = volume / 100;
+                    that.videoVolume = volume;
                 }
 
                 that.$.volumeSlider.fire('change');
