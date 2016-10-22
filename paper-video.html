@@ -166,9 +166,8 @@
             'mousemove': '_wakeupControls'
         },
         attached: function() {
-
-            var that = this,
-                video;
+            const that = this;
+            var video, volume;
 
             that.$.container.addEventListener('keydown', function(e) {
                 if (e.which === 32 || e.key === 'Spacebar' || e.keyCode === 32) {
@@ -185,7 +184,6 @@
             })
 
             that.$.paperVideo.addEventListener('timeupdate', function() {
-
                 if (that.$.paperVideo.paused || that.$.paperVideo.ended) {
                     that.$.playPauseIcon.setAttribute('icon', 'av:play-arrow');
                 } else {
@@ -202,7 +200,6 @@
                 that.duration = video.duration;
                 that.currentTime = video.currentTime;
                 that.videoTimeline = (video.currentTime / video.duration) * 100;
-
             });
 
             that.$.paperVideo.addEventListener('pause', that._wakeupControls.bind(that));
@@ -226,26 +223,25 @@
                 }
             });
 
-            var volume;
             that.$.toggleMute.addEventListener('click', function(e) {
-
                 if (that.videoVolume) {
                     volume = that.videoVolume;
                     video.volume = that.videoVolume = 0;
                 } else {
                     volume && (video.volume = volume / 100);
-                    volume && (that.videoVolume = volume)
+                    volume && (that.videoVolume = volume);
                 }
 
                 that.$.volumeSlider.fire('change');
             });
+
             that.$.fullScreen.addEventListener('click', function() {
                 that.toggleFullScreen(that.$.container);
             });
         },
         readableDuration: function(seconds) {
-            sec = Math.floor(seconds);
-            min = Math.floor(sec / 60);
+            var sec = Math.floor(seconds);
+            var min = Math.floor(sec / 60);
             min = min >= 10 ? min : '0' + min;
             sec = Math.floor(sec % 60);
             sec = sec >= 10 ? sec : '0' + sec;
@@ -259,17 +255,17 @@
             return this.$.paperVideo.pause();
         },
         toggle: function() {
-            var that = this,
-                video = that.$.paperVideo;
+            const video = this.$.paperVideo;
 
             if (video.paused || video.ended) {
-                that.play();
+                this.play();
             } else {
-                that.pause();
+                this.pause();
             }
         },
         toggleFullScreen: function(elem) {
             elem = elem || document.documentElement;
+
             if (!document.fullscreenElement && !document.mozFullScreenElement &&
                 !document.webkitFullscreenElement && !document.msFullscreenElement) {
                 if (elem.requestFullscreen) {
@@ -301,6 +297,6 @@
         _sleepControls: function() {
             this.classList.add('controls-hidden');
         }
-    })
+    });
     </script>
 </dom-module>
