@@ -28,6 +28,7 @@ The following custom properties and mixins are available for styling:
 | --- | --- | --- |
 | `--paper-video-controls-background` | The background color of controllers | `white` |
 | `--paper-video-controls-color` | The text and icons color of controllers | `#595959` |
+| `--paper-video-ripple-color` | The ripple color for all taps on the container | `--paper-video-controls-color` |
 | `--paper-video-slider-color` | The timeline and volume sliders color | `#3367D6` |
 
 ###&lt;paper-video&gt; - Properties
@@ -36,9 +37,10 @@ The following properties are available:
 
 | Property Name | Description | Default |
 | --- | --- | --- |
-| `controls` | Enable/Disable the controls | `false` |
 | `autoplay` | Playing the video when it's loaded | `false` |
+| `autohide-controls` | Delay of inactivity (ms) after which the controls fade out &mdash; `0` deactivates. | `1000` |
+| `controls` | Enable/Disable the controls | `false` |
 | `loop` | Playing the video again if it's ended | `false` |
-| `preload` | Loading the video, when the page loads | `false` |
 | `muted` | Sets video to muted mode | `false` |
+| `preload` | Loading the video, when the page loads | `false` |
 | `video-volume` | Sets video volume | `100` |
