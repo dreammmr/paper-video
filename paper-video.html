@@ -197,7 +197,9 @@
                 // Setting the video parameters to the component
                 that.duration = video.duration;
                 that.currentTime = video.currentTime;
-                //that.videoTimeline = (video.currentTime / video.duration) * 100;
+                if (!this.$.durationSlider.pointerDown) {
+                    that.videoTimeline = (video.currentTime / video.duration) * 100;
+                }
             });
 
             video.addEventListener('pause', that._wakeupControls.bind(that));
