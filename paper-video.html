@@ -197,7 +197,8 @@
                 // Setting the video parameters to the component
                 that.duration = video.duration;
                 that.currentTime = video.currentTime;
-                if (!this.$.durationSlider.pointerDown) {
+
+                if (!that.$.durationSlider.pointerDown) {
                     that.videoTimeline = (video.currentTime / video.duration) * 100;
                 }
             });
