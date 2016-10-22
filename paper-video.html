@@ -116,7 +116,7 @@
                 <paper-icon-button id="toggleMute" icon="av:volume-up"></paper-icon-button>
                 <paper-slider id="volumeSlider" value="{{videoVolume}}"></paper-slider>
                 <paper-icon-button id="fullScreen" icon="icons:fullscreen"></paper-icon-button>
-        </div>
+            </paper-material>
         </div>
     </template>
     <script>
@@ -197,7 +197,7 @@
                 // Setting the video parameters to the component
                 that.duration = video.duration;
                 that.currentTime = video.currentTime;
-                that.videoTimeline = (video.currentTime / video.duration) * 100;
+                //that.videoTimeline = (video.currentTime / video.duration) * 100;
             });
 
             video.addEventListener('pause', that._wakeupControls.bind(that));
