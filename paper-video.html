@@ -22,271 +22,296 @@
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-icons/av-icons.html">
 <dom-module id="paper-video">
-	<style is="custom-style">
-		:host {
-			--paper-video-controls-background: white;
-			--paper-video-controls-color: #595959;
-			--paper-video-slider-color: var(--primary-color);
-      @apply(--paper-video);
-		}
-		:host paper-slider {
-			--paper-slider-active-color: var(--paper-video-slider-color);
-			--paper-slider-knob-color: var(--paper-video-slider-color);
-		}
-		:host .container {
-			position: relative;
-			display: inline-block;
-      outline: none;
-      @apply(--paper-video-container);
-		}
+    <style is="custom-style">
+    :host {
+        --paper-video-controls-background: white;
+        --paper-video-controls-color: #595959;
+        --paper-video-slider-color: var(--primary-color);
+        @apply(--paper-video);
+    }
+    
+    :host paper-slider {
+        --paper-slider-active-color: var(--paper-video-slider-color);
+        --paper-slider-knob-color: var(--paper-video-slider-color);
+    }
+    
+    :host .container {
+        position: relative;
+        display: inline-block;
+        outline: none;
+        @apply(--paper-video-container);
+    }
+    
     :host .video {
-      @apply(--paper-video-wrapper);
+        @apply(--paper-video-wrapper);
     }
-		:host #videoControls {
-			position: absolute;
-			bottom: 4px;
-			left: 0;
-			right: 0;
-			display: flex;
-			color: var(--paper-video-controls-color);
-			background-color: var(--paper-video-controls-background);
-			padding: 15px;
-			align-items: center;
-      transition: 0.1s;
-      @apply(--paper-video-controls);
-		}
-		:host paper-ripple {
-			color: var(--paper-video-ripple-color, var(--paper-video-controls-color));
-			opacity: 0.4;
-		}
-		:host #durationSlider {
-			flex: 1;
-		}
-		:host #volumeSlider {
-			max-width: 120px;
-		}
-		:host .video-time {
-      @apply(--paper-font-caption);
-		}
-		:host #container:-webkit-full-screen, :host #container:-webkit-full-screen video {
-		  width: 100vw;
-		  height: 100vh;
-		}
-		:host video {
-			background-color: black;
-      @apply(--paper-video-video);
-		}
+    
+    :host #videoControls {
+        position: absolute;
+        bottom: 4px;
+        left: 0;
+        right: 0;
+        display: flex;
+        color: var(--paper-video-controls-color);
+        background-color: var(--paper-video-controls-background);
+        padding: 15px;
+        align-items: center;
+        transition: 0.1s;
+        @apply(--paper-video-controls);
+    }
+    
+    :host paper-ripple {
+        color: var(--paper-video-ripple-color, var(--paper-video-controls-color));
+        opacity: 0.4;
+    }
+    
+    :host #durationSlider {
+        flex: 1;
+    }
+    
+    :host #volumeSlider {
+        max-width: 120px;
+    }
+    
+    :host .video-time {
+        @apply(--paper-font-caption);
+    }
+    
+    :host #container:-webkit-full-screen,
+    :host #container:-webkit-full-screen video {
+        width: 100vw;
+        height: 100vh;
+    }
+    
+    :host video {
+        background-color: black;
+        @apply(--paper-video-video);
+    }
+    
     :host(.controls-hidden) {
-      cursor: none;
+        cursor: none;
     }
+    
     :host(.controls-hidden:not([controls])) {
-      cursor: default;
+        cursor: default;
     }
+    
     :host(.controls-hidden) #videoControls {
-      transition: 0.5s;
-      opacity: 0;
-      pointer-events: none;
-      touch-action: none;
+        transition: 0.5s;
+        opacity: 0;
+        pointer-events: none;
+        touch-action: none;
     }
-	</style>
-	<template>
-		<div id="container" class="container" tabindex$=[[tabindex]]>
-			<paper-ripple></paper-ripple>
-			<div class="video">
-				<video on-tap="toggle" muted="{{muted}}" width="{{width}}" poster="{{poster}}" preload="{{preload}}" height="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
-			</div>
-			<paper-material elevation="1" hidden$="{{!controls}}" id="videoControls">
-				<paper-icon-button id="playPauseIcon" on-tap="toggle" icon="av:play-arrow"></paper-icon-button>
-				<span class="video-time">{{currentTick}}/{{durationTick}}</span>
-				<paper-slider id="durationSlider" value="{{videoTimeline}}"></paper-slider>
-				<paper-icon-button id="toggleMute" icon="av:volume-up"></paper-icon-button>
-				<paper-slider id="volumeSlider" value="{{videoVolume}}"></paper-slider>
-				<paper-icon-button id="fullScreen" icon="icons:fullscreen"></paper-icon-button>
-			</div>
-		</div>
-	</template>
-	<script>
-		Polymer({
-			is: 'paper-video',
-			properties: {
-        tabindex: {
-          type: Number,
-          value: 0
-        },
-				controls: {
-					type: Boolean,
-					value: false,
-					notify: true,
-          reflectToAttribute: true
-				},
-				autoplay: {
-					type: Boolean,
-					value: false,
-					notify: true
-				},
-				loop: {
-					type: Boolean,
-					value: false,
-					notify: true
-				},
-				preload: {
-					type: Boolean,
-					value: false,
-					notify: true
-				},
-				muted: {
-					type: Boolean,
-					value: false,
-					reflectToAttribute: true,
-					notify: true
-				},
-				videoVolume: {
-					value: 100
-				},
-        autohideControls: {
-          type: Number,
-          value: 1000
-        }
-			},
-      listeners: {
-        'mousemove': '_wakeupControls'
-      },
-			attached: function(){
-
-				var that = this,
-					video;
-
-        that.$.container.addEventListener('keydown', function(e) {
-          if (e.which === 32 || e.key === 'Spacebar' || e.keyCode === 32) {
-            that.toggle();
-            e.preventDefault();
-          }
-        })
-
-				that.$.paperVideo.addEventListener('canplay', function(){
-					video = that.$.paperVideo;
-
-					that.currentTick = that.readableDuration(video.currentTime);
-					that.durationTick = that.readableDuration(video.duration);
-				})
-
-				that.$.paperVideo.addEventListener('timeupdate', function(){
-
-					if(that.$.paperVideo.paused || that.$.paperVideo.ended) {
-						that.$.playPauseIcon.setAttribute('icon', 'av:play-arrow');
-					} else {
-						that.$.playPauseIcon.setAttribute('icon', 'av:pause');
-            if (that.autohideControls > 0 && !that._controlSleepTimeout) {
-              that._controlSleepTimeout = setTimeout(that._sleepControls.bind(that), that.autohideControls);
+    </style>
+    <template>
+        <div id="container" class="container" tabindex$=[[tabindex]]>
+            <paper-ripple></paper-ripple>
+            <div class="video">
+                <video on-tap="_handleTap" muted="{{muted}}" width="{{width}}" poster="{{poster}}" preload="{{preload}}" height="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
+            </div>
+            <paper-material elevation="1" hidden$="{{!controls}}" id="videoControls">
+                <paper-icon-button id="playPauseIcon" on-tap="toggle" icon="av:play-arrow"></paper-icon-button>
+                <span class="video-time">{{currentTick}}/{{durationTick}}</span>
+                <paper-slider id="durationSlider" value="{{videoTimeline}}"></paper-slider>
+                <paper-icon-button id="toggleMute" icon="av:volume-up"></paper-icon-button>
+                <paper-slider id="volumeSlider" value="{{videoVolume}}"></paper-slider>
+                <paper-icon-button id="fullScreen" icon="icons:fullscreen"></paper-icon-button>
+            </paper-material>
+        </div>
+    </template>
+    <script>
+    Polymer({
+        is: 'paper-video',
+        properties: {
+            tabindex: {
+                type: Number,
+                value: 0
+            },
+            controls: {
+                type: Boolean,
+                value: false,
+                notify: true,
+                reflectToAttribute: true
+            },
+            autoplay: {
+                type: Boolean,
+                value: false,
+                notify: true
+            },
+            loop: {
+                type: Boolean,
+                value: false,
+                notify: true
+            },
+            preload: {
+                type: Boolean,
+                value: false,
+                notify: true
+            },
+            muted: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true,
+                notify: true
+            },
+            videoVolume: {
+                value: 100
+            },
+            autohideControls: {
+                type: Number,
+                value: 1000
+            },
+            _dblTapDelay: {
+                type: Number,
+                value: 300
             }
-          }
+        },
+        listeners: {
+            'mousemove': '_wakeupControls'
+        },
+        attached: function() {
+            const that = this,
+                video = that.$.paperVideo;
+            var volume;
 
-					video = that.$.paperVideo;
-					that.currentTick = that.readableDuration(video.currentTime);
+            that.$.container.addEventListener('keydown', function(e) {
+                if (e.which === 32 || e.key === 'Spacebar' || e.keyCode === 32) {
+                    that.toggle();
+                    e.preventDefault();
+                }
+            })
 
-					// Setting the video parameters to the component
-					that.duration = video.duration;
-					that.currentTime = video.currentTime;
-					that.videoTimeline = ( video.currentTime / video.duration ) * 100;
+            that.$.paperVideo.addEventListener('canplay', function() {
+                that.currentTick = that.readableDuration(video.currentTime);
+                that.durationTick = that.readableDuration(video.duration);
+            })
 
-				});
+            video.addEventListener('timeupdate', function() {
+                if (video.paused || video.ended) {
+                    that.$.playPauseIcon.setAttribute('icon', 'av:play-arrow');
+                } else {
+                    that.$.playPauseIcon.setAttribute('icon', 'av:pause');
+                    if (that.autohideControls > 0 && !that._controlSleepTimeout) {
+                        that._controlSleepTimeout = setTimeout(that._sleepControls.bind(that), that.autohideControls);
+                    }
+                }
 
-        that.$.paperVideo.addEventListener('pause', that._wakeupControls.bind(that));
-        that.$.paperVideo.addEventListener('stalled', that._wakeupControls.bind(that));
-        that.$.paperVideo.addEventListener('waiting', that._wakeupControls.bind(that));
-        that.$.paperVideo.addEventListener('error', that._wakeupControls.bind(that));
+                that.currentTick = that.readableDuration(video.currentTime);
 
-				function setTimelineFrame(e){
-					video = that.$.paperVideo;
-					video.currentTime = Math.floor(video.duration * e.target.getAttribute('value') / 100);
-				}
+                // Setting the video parameters to the component
+                that.duration = video.duration;
+                that.currentTime = video.currentTime;
 
-				that.$.durationSlider.addEventListener('change', setTimelineFrame);
-				that.$.volumeSlider.addEventListener('change', function(e){
-					video.volume = that.videoVolume / 100;
+                if (!that.$.durationSlider.pointerDown) {
+                    that.videoTimeline = (video.currentTime / video.duration) * 100;
+                }
+            });
 
-					if(video.volume) {
-						that.$.toggleMute.setAttribute('icon', 'av:volume-up');
-					} else {
-						that.$.toggleMute.setAttribute('icon', 'av:volume-off');
-					}
-				});
+            video.addEventListener('pause', that._wakeupControls.bind(that));
+            video.addEventListener('stalled', that._wakeupControls.bind(that));
+            video.addEventListener('waiting', that._wakeupControls.bind(that));
+            video.addEventListener('error', that._wakeupControls.bind(that));
 
-				var volume;
-				that.$.toggleMute.addEventListener('click', function(e){
+            that.$.durationSlider.addEventListener('change', function(e) {
+                video.currentTime = Math.floor(video.duration * e.target.getAttribute('value') / 100);
+            });
 
-					if(that.videoVolume) {
-						volume = that.videoVolume;
-						video.volume = that.videoVolume = 0;
-					} else {
-						volume && (video.volume = volume / 100);
-						volume && (that.videoVolume = volume)
-					}
+            that.$.volumeSlider.addEventListener('change', function(e) {
+                video.volume = that.videoVolume / 100;
 
-					that.$.volumeSlider.fire('change');
-				});
-				that.$.fullScreen.addEventListener('click', function(){
-					that.toggleFullScreen(that.$.container);
-				});
-			},
-			readableDuration: function(seconds) {
-				sec = Math.floor( seconds );
-				min = Math.floor( sec / 60 );
-				min = min >= 10 ? min : '0' + min;
-				sec = Math.floor( sec % 60 );
-				sec = sec >= 10 ? sec : '0' + sec;
+                if (video.volume) {
+                    that.$.toggleMute.setAttribute('icon', 'av:volume-up');
+                } else {
+                    that.$.toggleMute.setAttribute('icon', 'av:volume-off');
+                }
+            });
 
-				return min + ':' + sec;
-		    },
-			play: function(){
-				return this.$.paperVideo.play();
-			},
-			pause: function(){
-				return this.$.paperVideo.pause();
-			},
-			toggle: function(){
-				var that = this,
-				video = that.$.paperVideo;
+            that.$.toggleMute.addEventListener('click', function(e) {
+                if (that.videoVolume) {
+                    volume = that.videoVolume;
+                    video.volume = that.videoVolume = 0;
+                } else if (volume) {
+                    video.volume = volume / 100;
+                    that.videoVolume = volume;
+                }
 
-				if(video.paused || video.ended) {
-					that.play();
-				} else {
-					that.pause();
-				}
-			},
-			toggleFullScreen: function(elem) {
-			  elem = elem || document.documentElement;
-			  if (!document.fullscreenElement && !document.mozFullScreenElement &&
-			    !document.webkitFullscreenElement && !document.msFullscreenElement) {
-			    if (elem.requestFullscreen) {
-			      elem.requestFullscreen();
-			    } else if (elem.msRequestFullscreen) {
-			      elem.msRequestFullscreen();
-			    } else if (elem.mozRequestFullScreen) {
-			      elem.mozRequestFullScreen();
-			    } else if (elem.webkitRequestFullscreen) {
-			      elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-			    }
-			  } else {
-			    if (document.exitFullscreen) {
-			      document.exitFullscreen();
-			    } else if (document.msExitFullscreen) {
-			      document.msExitFullscreen();
-			    } else if (document.mozCancelFullScreen) {
-			      document.mozCancelFullScreen();
-			    } else if (document.webkitExitFullscreen) {
-			      document.webkitExitFullscreen();
-			    }
-			  }
-			},
-      _wakeupControls: function() {
-        clearTimeout(this._controlSleepTimeout);
-        this.classList.remove('controls-hidden');
-        this._controlSleepTimeout = null;
-      },
-      _sleepControls: function() {
-        this.classList.add('controls-hidden');
-      }
-		})
-	</script>
+                that.$.volumeSlider.fire('change');
+            });
+
+            that.$.fullScreen.addEventListener('click', function() {
+                that.toggleFullScreen(that.$.container);
+            });
+        },
+        readableDuration: function(seconds) {
+            var sec = Math.floor(seconds);
+            var min = Math.floor(sec / 60);
+            min = min >= 10 ? min : '0' + min;
+            sec = Math.floor(sec % 60);
+            sec = sec >= 10 ? sec : '0' + sec;
+
+            return min + ':' + sec;
+        },
+        play: function() {
+            return this.$.paperVideo.play();
+        },
+        pause: function() {
+            return this.$.paperVideo.pause();
+        },
+        toggle: function() {
+            const video = this.$.paperVideo;
+
+            if (video.paused || video.ended) {
+                this.play();
+            } else {
+                this.pause();
+            }
+        },
+        toggleFullScreen: function(elem) {
+            elem = elem || document.documentElement;
+
+            if (!document.fullscreenElement && !document.mozFullScreenElement &&
+                !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        },
+        _wakeupControls: function() {
+            clearTimeout(this._controlSleepTimeout);
+            this.classList.remove('controls-hidden');
+            this._controlSleepTimeout = null;
+        },
+        _sleepControls: function() {
+            this.classList.add('controls-hidden');
+        },
+        _handleTap: function() {
+            if (this._dblTapTimer) {
+                clearTimeout(this._dblTapTimer);
+                delete this._dblTapTimer;
+                this.toggleFullScreen(this.$.container);
+            } else {
+                this._dblTapTimer = setTimeout(function() {
+                    this.toggle();
+                    delete this._dblTapTimer;
+                }.bind(this), this._dblTapDelay);
+            }
+        }
+    });
+    </script>
 </dom-module>
