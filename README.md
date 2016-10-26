@@ -3,7 +3,7 @@
 `paper-video` is a material design styled video player. It contains a video placed in the top and
 controls in the bottom. User can fully customize the controllers and the events.
 
-[Live Example](http://spacee.xyz/paper-video/demo.html)
+[Live Example](http://spacee.xyz/polymer-components/paper-video/demo.html)
 
 ##Installing with Bower
 
