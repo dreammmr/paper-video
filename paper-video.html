@@ -107,7 +107,7 @@
         <div id="container" class="container" tabindex$=[[tabindex]]>
             <paper-ripple></paper-ripple>
             <div class="video">
-                <video on-tap="_handleTap" muted="{{muted}}" width="{{width}}" poster="{{poster}}" preload="{{preload}}" height="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
+                <video on-tap="_handleTap" muted="{{muted}}" width$="{{width}}" poster="{{poster}}" preload="{{preload}}" height$="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
             </div>
             <paper-material elevation="1" hidden$="{{!controls}}" id="videoControls">
                 <paper-icon-button id="playPauseIcon" on-tap="toggle" icon="av:play-arrow"></paper-icon-button>
