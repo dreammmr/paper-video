@@ -1,11 +1,11 @@
-##&lt;paper-video&gt;
+## &lt;paper-video&gt;
 
 `paper-video` is a material design styled video player. It contains a video placed in the top and
 controls in the bottom. User can fully customize the controllers and the events.
 
 [Live Example](http://spacee.xyz/polymer-components/paper-video/demo.html)
 
-##Installing with Bower
+### Installing with Bower
 
 To install the component with the Bower, just run: 
 
@@ -31,7 +31,7 @@ The following custom properties and mixins are available for styling:
 | `--paper-video-ripple-color` | The ripple color for all taps on the container | `--paper-video-controls-color` |
 | `--paper-video-slider-color` | The timeline and volume sliders color | `#3367D6` |
 
-###&lt;paper-video&gt; - Properties
+### Properties
 
 The following properties are available:
 
