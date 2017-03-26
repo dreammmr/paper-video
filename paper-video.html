@@ -105,8 +105,8 @@
     </style>
     <template>
         <div id="container" class="container" tabindex$=[[tabindex]]>
-            <paper-ripple></paper-ripple>
             <div class="video">
+                <paper-ripple></paper-ripple>
                 <video on-tap="_handleTap" muted="{{muted}}" width$="{{width}}" poster="{{poster}}" preload="{{preload}}" height$="{{height}}" id="paperVideo" src="{{src}}" autoplay="{{autoplay}}" loop="{{loop}}"></video>
             </div>
             <paper-material elevation="1" hidden$="{{!controls}}" id="videoControls">
